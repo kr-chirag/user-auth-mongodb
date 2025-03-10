@@ -21,10 +21,11 @@ export async function handleSignup(req: Request<{}, {}, IUser>, res: Response) {
             status: "error",
             message: "This email is alredy registered",
         });
+    } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await createUser(name, email, hashedPassword);
+        await login(user, res);
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await createUser(name, email, hashedPassword);
-    await login(user, res);
 }
 
 export async function handleLogin(

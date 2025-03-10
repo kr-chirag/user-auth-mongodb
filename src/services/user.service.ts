@@ -21,3 +21,12 @@ export async function getUserByID(userId: string) {
 export async function getAllUsers() {
     return await User.find({});
 }
+
+export async function updateUser(userId: string, updates: Partial<IUser>) {
+    await User.updateOne({ _id: userId }, updates);
+    return await getUserByID(userId);
+}
+
+export async function deleteUser(userId: string) {
+    await User.deleteOne({ _id: userId });
+}
