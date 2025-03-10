@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
-import jwt from "jsonwebtoken";
 import { getUserByID } from "../services/user.service";
 import { IUser } from "../models/user.model";
+import { decodeToken } from "../libs/jwt.lib";
 
 export async function checkAuth(
     req: Request,
@@ -11,12 +11,9 @@ export async function checkAuth(
     try {
         const authToken = req.cookies["auth-token"];
         if (authToken) {
-            const decodedToken = jwt.verify(
-                authToken,
-                process.env.SECRET_JWT || ""
-            ) as { id: string };
+            const decodedToken = await decodeToken(authToken);
             const user = await getUserByID(decodedToken.id);
-            req.user = user as IUser;
+            req.user = user;
             next();
         } else {
             res.status(401).json({ message: "Unauthorized" });
