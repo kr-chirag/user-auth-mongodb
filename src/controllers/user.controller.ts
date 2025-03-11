@@ -40,15 +40,23 @@ export async function handleUpdateProfile(
     res: Response
 ) {
     const { name, password } = req.body;
-    const newUser = await updateUser(req.user?._id as string, {
+    const user = await updateUser(req.user?.id, {
         name,
         password,
     });
-    res.cookie("auth-token", await createTokten(newUser));
+    if (user)
+        res.cookie(
+            "auth-token",
+            await createTokten({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            })
+        );
     res.status(200).json({
         status: "success",
         message: "user details updated",
-        user: newUser,
+        user: user,
     });
 }
 

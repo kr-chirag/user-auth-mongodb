@@ -4,15 +4,6 @@ import { createUser, getUserByEmail } from "../services/user.service";
 import bcrypt from "bcrypt";
 import { createTokten } from "../libs/jwt.lib";
 
-async function login(user: IUser, res: Response) {
-    res.cookie("auth-token", await createTokten(user));
-    res.status(201).json({
-        status: "success",
-        message: "Logged in successfully",
-        user,
-    });
-}
-
 export async function handleSignup(req: Request<{}, {}, IUser>, res: Response) {
     const { name, email, password } = req.body;
     const oldUser = await getUserByEmail(email);
@@ -24,7 +15,19 @@ export async function handleSignup(req: Request<{}, {}, IUser>, res: Response) {
     } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await createUser(name, email, hashedPassword);
-        await login(user, res);
+        res.cookie(
+            "auth-token",
+            await createTokten({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            })
+        );
+        res.status(201).json({
+            status: "success",
+            message: "User created and Logged in successfully",
+            user,
+        });
     }
 }
 
@@ -39,8 +42,21 @@ export async function handleLogin(
             status: "error",
             message: "No user found with this email",
         });
-    else if (await bcrypt.compare(password, user?.password)) login(user, res);
-    else
+    else if (await bcrypt.compare(password, user?.password)) {
+        res.cookie(
+            "auth-token",
+            await createTokten({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            })
+        );
+        res.status(200).json({
+            status: "success",
+            message: "Logged in successfully",
+            user,
+        });
+    } else
         res.status(400).json({
             status: "error",
             message: "Invalid Password",
