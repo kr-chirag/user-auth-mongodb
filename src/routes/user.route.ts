@@ -1,7 +1,6 @@
 import express from "express";
-import { handleLogin, handleSignup } from "../controllers/auth.controller";
 import {
-    handleDeleteProfile,
+    handleDeleteUser,
     handleGetAllUsers,
     handleGetProfile,
     handleGetUser,
@@ -13,12 +12,8 @@ const userRouter = express.Router();
 
 userRouter.use(checkAuth);
 
-userRouter
-    .route("/profile")
-    .get(handleGetProfile)
-    .post(handleUpdateProfile)
-    .delete(handleDeleteProfile);
-userRouter.get("/:userId", handleGetUser);
+userRouter.route("/profile").get(handleGetProfile).post(handleUpdateProfile);
+userRouter.route("/:userId").get(handleGetUser).delete(handleDeleteUser);
 userRouter.get("/", handleGetAllUsers);
 
 export default userRouter;

@@ -60,7 +60,7 @@ export async function handleUpdateProfile(
     });
 }
 
-export async function handleDeleteProfile(req: Request, res: Response) {
+export async function handleDeleteUser(req: Request, res: Response) {
     await deleteUser(req.user?._id as string);
     res.clearCookie("auth-token");
     res.status(200).json({
